@@ -26,28 +26,39 @@ namespace Booking.Controllers
 
         public async Task<IActionResult> BookingToggle(int? id)
         {
-            if (id == null) return NotFound();
+            if (id is null) return NotFound();
 
-            var user = await userManager.GetUserAsync(User);
+            //  olika sätt att hitta user:
+            // dbContext.Users bla bla
+            // User.Identity  bla bla
 
-            if (user == null) return NotFound();
+            var userId = userManager.GetUserId(User);
 
-            //var gymClass = dbContext.GymClasses
-            //    .FirstOrDefault(c => c.Id == id);
+            // If not logged in
+            if (userId is null) return NotFound(); 
 
-            var gymClass = await dbContext.GymClasses.FindAsync(id);
+            // Annat onödigt långt sätt att göra det på
+            //var gymClass = await dbContext.GymClasses
+            //    .Include(g => g.AttendedMembers)
+            //    .FirstOrDefaultAsync(c => c.Id == id);
 
-            // if user in attendedmembers then remove booking
+            //var attending = gymClass?
+            //    .AttendedMembers.FirstOrDefault(a => a.ApplicationUserId == userId);
 
-            
-            // else book
+            var attending = dbContext.ApplicationUserGymClasses
+                .Find(userId, id);
 
-            var booking = new ApplicationUserGymClass { ApplicationUser = user, GymClass = gymClass };
-            dbContext.Add(booking);
-
-
+            // if user not in attendedmembers then add booking
+            if (attending is null)
+            {
+                var booking = new ApplicationUserGymClass { ApplicationUserId = userId, GymClassId = (int)id };
+                dbContext.ApplicationUserGymClasses.Add(booking);
+            }
+            else
+            {
+                dbContext.ApplicationUserGymClasses.Remove(attending);
+            }
             await dbContext.SaveChangesAsync();
-
             return RedirectToAction(nameof(Index));
         }
 

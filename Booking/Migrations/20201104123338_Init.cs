@@ -172,7 +172,7 @@ namespace Booking.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ApplicationUserGymClass",
+                name: "ApplicationUserGymClasses",
                 columns: table => new
                 {
                     GymClassId = table.Column<int>(nullable: false),
@@ -180,15 +180,15 @@ namespace Booking.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ApplicationUserGymClass", x => new { x.ApplicationUserId, x.GymClassId });
+                    table.PrimaryKey("PK_ApplicationUserGymClasses", x => new { x.ApplicationUserId, x.GymClassId });
                     table.ForeignKey(
-                        name: "FK_ApplicationUserGymClass_AspNetUsers_ApplicationUserId",
+                        name: "FK_ApplicationUserGymClasses_AspNetUsers_ApplicationUserId",
                         column: x => x.ApplicationUserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ApplicationUserGymClass_GymClasses_GymClassId",
+                        name: "FK_ApplicationUserGymClasses_GymClasses_GymClassId",
                         column: x => x.GymClassId,
                         principalTable: "GymClasses",
                         principalColumn: "Id",
@@ -196,8 +196,8 @@ namespace Booking.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_ApplicationUserGymClass_GymClassId",
-                table: "ApplicationUserGymClass",
+                name: "IX_ApplicationUserGymClasses_GymClassId",
+                table: "ApplicationUserGymClasses",
                 column: "GymClassId");
 
             migrationBuilder.CreateIndex(
@@ -243,7 +243,7 @@ namespace Booking.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "ApplicationUserGymClass");
+                name: "ApplicationUserGymClasses");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");

@@ -105,7 +105,7 @@ namespace Booking.Migrations
 
                     b.HasIndex("GymClassId");
 
-                    b.ToTable("ApplicationUserGymClass");
+                    b.ToTable("ApplicationUserGymClasses");
                 });
 
             modelBuilder.Entity("Booking.Models.Entities.GymClass", b =>
