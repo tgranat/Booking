@@ -9,9 +9,11 @@ using Booking.Data;
 using Booking.Models.Entities;
 using Microsoft.AspNetCore.Identity;
 using System.Runtime.InteropServices.WindowsRuntime;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Booking.Controllers
 {
+    [Authorize]
     public class GymClassesController : Controller
     {
         private readonly ApplicationDbContext dbContext;
@@ -22,7 +24,6 @@ namespace Booking.Controllers
             dbContext = context;
             userManager = manager;
         }
-
 
         public async Task<IActionResult> BookingToggle(int? id)
         {
@@ -62,7 +63,7 @@ namespace Booking.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-
+        [AllowAnonymous]
         // GET: GymClasses
         public async Task<IActionResult> Index()
         {
