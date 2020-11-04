@@ -134,11 +134,22 @@ namespace Booking.Controllers
             }
 
             var gymClass = await dbContext.GymClasses.FindAsync(id);
+
             if (gymClass == null)
             {
                 return NotFound();
             }
-            return View(gymClass);
+
+            var viewModel = new EditGymClassViewModel
+            {
+                Id = gymClass.Id,
+                Name = gymClass.Name,
+                StartDate = gymClass.StartDate,
+                Duration = gymClass.Duration,
+                Description = gymClass.Description
+            };
+
+            return View(viewModel);
         }
 
         // POST: GymClasses/Edit/5

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Booking.Models.ViewModels
 {
-    public class CreateGymClassViewModel
+    public class EditGymClassViewModel
     {
         public int Id { get; set; }
         [Required]
@@ -20,5 +20,3 @@ namespace Booking.Models.ViewModels
         public string Description { get; set; }
     }
 }
-
-
