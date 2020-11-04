@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -15,6 +16,7 @@ namespace Booking.Models.Entities
         public string Description { get; set; }
 
         //Navigation property
+        [Display(Name = "Attending members")]
         public ICollection<ApplicationUserGymClass> AttendedMembers { get; set; }
     }
 }

@@ -82,6 +82,8 @@ namespace Booking.Controllers
             }
 
             var gymClass = await dbContext.GymClasses
+                .Include(c => c.AttendedMembers)
+                .ThenInclude(a => a.ApplicationUser)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (gymClass == null)
             {
