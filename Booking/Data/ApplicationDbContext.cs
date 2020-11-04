@@ -25,6 +25,9 @@ namespace Booking.Data
             base.OnModelCreating(builder);
             // Fix composite key
             builder.Entity<ApplicationUserGymClass>().HasKey(k => new { k.ApplicationUserId, k.GymClassId });
+
+            // Queryfilter
+            builder.Entity<GymClass>().HasQueryFilter(g => g.StartDate > DateTime.Now);
         }
     }
 }
