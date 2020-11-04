@@ -30,11 +30,23 @@ namespace Booking.Controllers
 
             var user = await userManager.GetUserAsync(User);
 
-            var gymPass = dbContext.GymClasses
-                .FirstOrDefault(c => c.Id == id);
+            if (user == null) return NotFound();
+
+            //var gymClass = dbContext.GymClasses
+            //    .FirstOrDefault(c => c.Id == id);
+
+            var gymClass = await dbContext.GymClasses.FindAsync(id);
 
             // if user in attendedmembers then remove booking
+
+            
             // else book
+
+            var booking = new ApplicationUserGymClass { ApplicationUser = user, GymClass = gymClass };
+            dbContext.Add(booking);
+
+
+            await dbContext.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
         }
