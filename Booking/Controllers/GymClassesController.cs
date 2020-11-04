@@ -67,7 +67,10 @@ namespace Booking.Controllers
         // GET: GymClasses
         public async Task<IActionResult> Index()
         {
-            return View(await dbContext.GymClasses.ToListAsync());
+            // How override QueryFilter
+            return View(await dbContext.GymClasses
+              //  .IgnoreQueryFilters()
+                .ToListAsync());
         }
 
         // GET: GymClasses/Details/5
