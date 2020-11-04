@@ -16,7 +16,7 @@ namespace Booking.Data
         {
             using (var context = new ApplicationDbContext(services.GetRequiredService<DbContextOptions<ApplicationDbContext>>()))
             {
-                if (context.GymClass.Any()) return;
+                if (context.GymClasses.Any()) return;
 
                 var fake = new Faker("sv");
                 var gymClasses = new List<GymClass>();

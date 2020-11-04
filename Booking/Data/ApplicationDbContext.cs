@@ -9,7 +9,7 @@ namespace Booking.Data
 {
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
-        public DbSet<GymClass> GymClass { get; set; }
+        public DbSet<GymClass> GymClasses { get; set; }
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {

@@ -129,7 +129,7 @@ namespace Booking.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("GymClass");
+                    b.ToTable("GymClasses");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

@@ -50,7 +50,7 @@ namespace Booking.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "GymClass",
+                name: "GymClasses",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
@@ -62,7 +62,7 @@ namespace Booking.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_GymClass", x => x.Id);
+                    table.PrimaryKey("PK_GymClasses", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -188,9 +188,9 @@ namespace Booking.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ApplicationUserGymClass_GymClass_GymClassId",
+                        name: "FK_ApplicationUserGymClass_GymClasses_GymClassId",
                         column: x => x.GymClassId,
-                        principalTable: "GymClass",
+                        principalTable: "GymClasses",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -261,7 +261,7 @@ namespace Booking.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "GymClass");
+                name: "GymClasses");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
