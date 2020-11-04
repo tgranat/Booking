@@ -15,10 +15,13 @@ namespace Booking.Data
         {
         }
 
+        //Tyvärr finns ännu inte funktionaliteten att definiera upp en komposit nyckel med hjälp av data
+        //annotations.Så vi får använda oss av fluent api för att åstadkomma det.
+        //Vi använder oss av en override av OnModelCreating
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
-        // Fix composite key
+            // Fix composite key
             builder.Entity<ApplicationUserGymClass>().HasKey(k => new { k.ApplicationUserId, k.GymClassId });
         }
     }
