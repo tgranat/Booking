@@ -34,6 +34,7 @@ namespace Booking.Data
                 }
 
                 await context.AddRangeAsync(gymClasses);
+                await context.SaveChangesAsync();
             }
         }
     }
