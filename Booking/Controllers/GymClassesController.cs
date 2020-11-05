@@ -15,7 +15,7 @@ using Booking.Filters;
 
 namespace Booking.Controllers
 {
-    [Authorize]
+    [Authorize]   // Login required (except for actions when [AllowAnonymous] is used)
     public class GymClassesController : Controller
     {
         private readonly ApplicationDbContext dbContext;
@@ -27,10 +27,9 @@ namespace Booking.Controllers
             userManager = manager;
         }
 
+        [RequiredIdAndModelFilter]
         public async Task<IActionResult> BookingToggle(int? id)
         {
-            if (id is null) return NotFound();
-
             //  olika sätt att hitta user:
             // dbContext.Users bla bla
             // User.Identity  bla bla
@@ -51,7 +50,6 @@ namespace Booking.Controllers
             var attending = dbContext.ApplicationUserGymClasses
                 .Find(userId, id);
 
-            // if user not in attendedmembers then add booking
             if (attending is null)
             {
                 var booking = new ApplicationUserGymClass { ApplicationUserId = userId, GymClassId = (int)id };
@@ -65,8 +63,8 @@ namespace Booking.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        [AllowAnonymous]
         // GET: GymClasses
+        [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
             return View(await dbContext.GymClasses
@@ -75,15 +73,10 @@ namespace Booking.Controllers
                 .ToListAsync());
         }
 
-        [RequiredIdAndModelFilter]
         // GET: GymClasses/Details/5
+        [RequiredIdAndModelFilter]
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
             var gymClass = await dbContext.GymClasses
                 .Include(c => c.AttendedMembers)
                 .ThenInclude(a => a.ApplicationUser)
@@ -124,13 +117,9 @@ namespace Booking.Controllers
         }
 
         // GET: GymClasses/Edit/5
+        [RequiredIdAndModelFilter]
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
             var gymClass = await dbContext.GymClasses.FindAsync(id);
 
             if (gymClass == null)
@@ -189,11 +178,6 @@ namespace Booking.Controllers
         [RequiredIdAndModelFilter]
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
             var gymClass = await dbContext.GymClasses
                 .FirstOrDefaultAsync(m => m.Id == id);
   
