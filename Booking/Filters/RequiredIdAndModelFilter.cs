@@ -16,10 +16,18 @@ namespace Booking.Filters
     {
         public override void OnActionExecuting(ActionExecutingContext context)
         {
-            if (context.ActionArguments.Count == 0) context.Result = new NotFoundResult();
+            // Another way to look at property:
+            // if (context.RouteData.Values["id] == null)
+
             if (context.ActionArguments.TryGetValue("id", out object idValue))
             {
+                // Property found, test if null
                 if (idValue is null) context.Result = new NotFoundResult();
+            }
+            else
+            {
+                // No property found
+                context.Result = new NotFoundResult();
             }
         }
         public override void OnResultExecuting(ResultExecutingContext context)
