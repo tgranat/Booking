@@ -27,6 +27,17 @@ namespace Booking.Controllers
             userManager = manager;
         }
 
+        public async Task<IActionResult> GetBookings()
+        {
+            var userId = userManager.GetUserId(User);
+            var model = dbContext.ApplicationUserGymClasses
+                .IgnoreQueryFilters()
+                .Where(u => u.ApplicationUserId == userId)
+                .Select(g => g.GymClass);
+
+            return View(nameof(Index), await model.ToListAsync());
+        }
+
         [RequiredIdAndModelFilter] 
         public async Task<IActionResult> BookingToggle(int? id)
         {
