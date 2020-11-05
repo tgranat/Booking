@@ -30,12 +30,22 @@ namespace Booking.Controllers
         public async Task<IActionResult> GetBookings()
         {
             var userId = userManager.GetUserId(User);
-            var model = dbContext.ApplicationUserGymClasses
-                .IgnoreQueryFilters()
-                .Where(u => u.ApplicationUserId == userId)
-                .Select(g => g.GymClass);
-
-            return View(nameof(Index), await model.ToListAsync());
+            var model = new IndexViewModel
+            {
+                GymClasses = await dbContext.ApplicationUserGymClasses
+                    .IgnoreQueryFilters()
+                    .Where(u => u.ApplicationUserId == userId)
+                    .Select(g => new GymClassViewModel
+                    {
+                        Id = g.GymClass.Id,
+                        Name = g.GymClass.Name,
+                        StartDate = g.GymClass.StartDate,
+                        Duration = g.GymClass.Duration,
+                        IsAttending = g.GymClass.AttendedMembers.Any(m => m.ApplicationUserId == userId)
+                    })
+                    .ToListAsync()
+            };
+            return View(nameof(Index),  model);
         }
 
         [RequiredIdAndModelFilter] 
@@ -80,10 +90,22 @@ namespace Booking.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
-            return View(await dbContext.GymClasses
-              // How to override QueryFilter
-              //  .IgnoreQueryFilters()
-                .ToListAsync());
+            var userId = userManager.GetUserId(User);
+            var model = new IndexViewModel
+            {
+                GymClasses = await dbContext.GymClasses
+                    .Include(c => c.AttendedMembers)
+                    .Select(g => new GymClassViewModel
+                    {
+                        Id = g.Id,
+                        Name = g.Name,
+                        StartDate = g.StartDate,
+                        Duration = g.Duration,
+                        IsAttending = g.AttendedMembers.Any(m => m.ApplicationUserId == userId)
+                    })
+                    .ToListAsync()
+            };
+            return View(nameof(Index), model);
         }
 
         // GET: GymClasses/Details/5
