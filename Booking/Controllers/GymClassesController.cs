@@ -27,7 +27,7 @@ namespace Booking.Controllers
             userManager = manager;
         }
 
-        [RequiredIdAndModelFilter]
+        [RequiredIdAndModelFilter] 
         public async Task<IActionResult> BookingToggle(int? id)
         {
             //  olika sätt att hitta user:
@@ -49,6 +49,8 @@ namespace Booking.Controllers
 
             var attending = dbContext.ApplicationUserGymClasses
                 .Find(userId, id);
+
+            // TODO: check that id (GymClass) exist
 
             if (attending is null)
             {
