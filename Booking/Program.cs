@@ -29,12 +29,16 @@ namespace Booking
                 var context = services.GetRequiredService<ApplicationDbContext>();
                 // Apply pending migrations. Create database if not existing.
                 context.Database.Migrate();
-                // Get configuration (not used for now)
+                // Get configuration 
                 var config = services.GetRequiredService<IConfiguration>();
+
+                //dotnet user secrets set "AdminPW" "password"
+
+                var adminPW = config["AdminPW"];
 
                 try
                 {
-                    SeedData.InitializeAsync(services).Wait();   // wait for task to complete
+                    SeedData.InitializeAsync(services, adminPW).Wait();   // wait for task to complete
                 }
                 catch (Exception e)
                 {

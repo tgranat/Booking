@@ -34,6 +34,7 @@ namespace Booking
 
             // Default IdentityUser changed to ApplicationUser (which extends IdentityUser)
             services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = false) 
+                .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
             services.Configure<IdentityOptions>(opt =>

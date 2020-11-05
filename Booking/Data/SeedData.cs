@@ -1,5 +1,6 @@
 ﻿using Bogus;
 using Booking.Models.Entities;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -12,7 +13,7 @@ namespace Booking.Data
     public class SeedData
     {
         // Initialize database with bogus data. Called from Program.cs
-        public static async Task InitializeAsync(IServiceProvider services)
+        public static async Task InitializeAsync(IServiceProvider services, string adminPW)
         {
             using (var context = new ApplicationDbContext(services.GetRequiredService<DbContextOptions<ApplicationDbContext>>()))
             {
@@ -34,6 +35,57 @@ namespace Booking.Data
                 }
 
                 await context.AddRangeAsync(gymClasses);
+
+                var userManger = services.GetRequiredService<UserManager<ApplicationUser>>();
+                var roleManger = services.GetRequiredService<RoleManager<IdentityRole>>();
+
+                var roleNames = new[] { "Admin", "Member" };
+
+
+                foreach (var roleName in roleNames)
+                {
+                    if (await roleManger.RoleExistsAsync(roleName)) continue;
+
+                    var role = new IdentityRole { Name = roleName };
+                    var result = await roleManger.CreateAsync(role);
+
+                    if (!result.Succeeded) throw new Exception(string.Join("\n", result.Errors));
+
+                }
+
+
+                var adminEmail = "admin@gym.se";
+
+                var foundUser = await userManger.FindByEmailAsync(adminEmail);
+
+                if (foundUser != null) return;
+
+                var admin = new ApplicationUser
+                {
+                    UserName = adminEmail,
+                    Email = adminEmail,
+                    FirstName = "Admin",
+                    LastName = "Gym",
+                    TimeOfRegistration = DateTime.Now
+                };
+
+                var addAdminResult = await userManger.CreateAsync(admin, adminPW);
+
+                if (!addAdminResult.Succeeded) throw new Exception(string.Join("\n", addAdminResult.Errors));
+
+                var adminUser = await userManger.FindByNameAsync(adminEmail);
+
+                foreach (var role in roleNames)
+                {
+                    if (await userManger.IsInRoleAsync(adminUser, role)) continue;
+                    var addToRoleResult = await userManger.AddToRoleAsync(adminUser, role);
+                    if (!addToRoleResult.Succeeded) throw new Exception(string.Join("\n", addToRoleResult.Errors));
+
+                }
+
+
+
+
                 await context.SaveChangesAsync();
             }
         }
