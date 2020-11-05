@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Identity;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Microsoft.AspNetCore.Authorization;
 using Booking.Models.ViewModels;
+using Booking.Filters;
 
 namespace Booking.Controllers
 {
@@ -68,12 +69,13 @@ namespace Booking.Controllers
         // GET: GymClasses
         public async Task<IActionResult> Index()
         {
-            // How override QueryFilter
             return View(await dbContext.GymClasses
+              // How to override QueryFilter
               //  .IgnoreQueryFilters()
                 .ToListAsync());
         }
 
+        [RequiredIdAndModelFilter]
         // GET: GymClasses/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -86,10 +88,6 @@ namespace Booking.Controllers
                 .Include(c => c.AttendedMembers)
                 .ThenInclude(a => a.ApplicationUser)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (gymClass == null)
-            {
-                return NotFound();
-            }
 
             return View(gymClass);
         }
@@ -188,6 +186,7 @@ namespace Booking.Controllers
         }
 
         // GET: GymClasses/Delete/5
+        [RequiredIdAndModelFilter]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -197,11 +196,7 @@ namespace Booking.Controllers
 
             var gymClass = await dbContext.GymClasses
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (gymClass == null)
-            {
-                return NotFound();
-            }
-
+  
             return View(gymClass);
         }
 
