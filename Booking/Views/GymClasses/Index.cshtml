@@ -39,7 +39,19 @@
             </td>
   
             <td>
-                <a asp-action="BookingToggle" asp-route-id="@item.Id">Book</a> |
+                @if (item.IsAttending)
+                {
+                    <a asp-action="BookingToggle" asp-route-id="@item.Id"
+                       class="btn btn-danger">Cancel                      
+                    </a>
+                }
+                else
+                {
+                    <a asp-action="BookingToggle" asp-route-id="@item.Id"
+                       class="btn btn-success">Book
+                    </a>
+                } |
+
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
                 <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
