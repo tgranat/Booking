@@ -26,8 +26,8 @@ namespace Booking.Data
             // Fix composite key
             builder.Entity<ApplicationUserGymClass>().HasKey(k => new { k.ApplicationUserId, k.GymClassId });
 
-            // Queryfilter
-            //builder.Entity<GymClass>().HasQueryFilter(g => g.StartDate > DateTime.Now);
+            // Queryfilter. Default don't show older GymClass'es 
+            builder.Entity<GymClass>().HasQueryFilter(g => g.StartDate > DateTime.Now);
         }
     }
 }
