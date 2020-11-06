@@ -24,34 +24,32 @@ namespace Booking.Controllers
         private readonly ApplicationDbContext dbContext;
         private readonly UserManager<ApplicationUser> userManager;
         private readonly GymClassRepository gymClassRepository;
+        private readonly ApplicationUserRepository applicationUserRepository;
 
         public GymClassesController(ApplicationDbContext context, UserManager<ApplicationUser> manager)
         {
             dbContext = context;
             userManager = manager;
             gymClassRepository = new GymClassRepository(context);    // Must provide context
+            applicationUserRepository = new ApplicationUserRepository(context);
+
         }
 
         public async Task<IActionResult> GetBookings()
         {
             var userId = userManager.GetUserId(User);
+            var model = new IndexViewModel();
+            var gymClasses = await applicationUserRepository.GetBookings(userId);
 
-            // TODO handle if no bookings
-            var model = new IndexViewModel
-            {
-                GymClasses = await dbContext.ApplicationUserGymClasses
-                    .IgnoreQueryFilters()
-                    .Where(u => u.ApplicationUserId == userId)
-                    .Select(g => new GymClassViewModel
-                    {
-                        Id = g.GymClass.Id,
-                        Name = g.GymClass.Name,
-                        StartDate = g.GymClass.StartDate,
-                        Duration = g.GymClass.Duration,
-                        IsAttending = g.GymClass.AttendedMembers.Any(m => m.ApplicationUserId == userId)
-                    })
-                    .ToListAsync()
-            };
+            model.GymClasses = gymClasses
+                .Select(g => new GymClassViewModel
+                {
+                    Id = g.GymClass.Id,
+                    Name = g.GymClass.Name,
+                    StartDate = g.GymClass.StartDate,
+                    Duration = g.GymClass.Duration,
+                    IsAttending = g.GymClass.AttendedMembers.Any(m => m.ApplicationUserId == userId)
+                });
             return View(nameof(Index),  model);
         }
 
@@ -66,14 +64,6 @@ namespace Booking.Controllers
 
             // If not logged in
             if (userId is null) return NotFound(); 
-
-            // Annat onödigt långt sätt att göra det på
-            //var gymClass = await dbContext.GymClasses
-            //    .Include(g => g.AttendedMembers)
-            //    .FirstOrDefaultAsync(c => c.Id == id);
-
-            //var attending = gymClass?
-            //    .AttendedMembers.FirstOrDefault(a => a.ApplicationUserId == userId);
 
             var attending = dbContext.ApplicationUserGymClasses
                 .Find(userId, id);
@@ -112,8 +102,7 @@ namespace Booking.Controllers
                     });
             }
 
-            // ShowHistory show booked gymclasses including old (before todays date)
-            // Maybe should only show old classes, but easier to test like this...
+            // ShowHistory show old gymclasses (before todays date)
 
             // When ShowHistory checkbox is set in index.cshtmp, JavaScript (in site.js) submits
 

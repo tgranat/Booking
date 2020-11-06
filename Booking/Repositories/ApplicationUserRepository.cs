@@ -1,4 +1,6 @@
 ﻿using Booking.Data;
+using Booking.Models.Entities;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +15,25 @@ namespace Booking.Repositories
         public ApplicationUserRepository(ApplicationDbContext db)
         {
             this.db = db;
+        }
+
+        public async Task<IEnumerable<ApplicationUserGymClass>> GetBookings(string userId)
+        {
+            return await db.ApplicationUserGymClasses
+                                           .IgnoreQueryFilters()
+                                           .Include(g => g.GymClass)
+                                           .Where(u => u.ApplicationUserId == userId)
+                                           .ToListAsync();
+        }
+
+        public ApplicationUserGymClass GetAttending(int? id, string userId)
+        {
+            return db.ApplicationUserGymClasses.Find(userId, id);
+        }
+
+        public void Add(ApplicationUserGymClass attending)
+        {
+            db.Add(attending);
         }
 
     }
