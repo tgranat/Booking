@@ -12,6 +12,7 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using Microsoft.AspNetCore.Authorization;
 using Booking.Models.ViewModels;
 using Booking.Filters;
+using Booking.Repositories;
 
 namespace Booking.Controllers
 {
@@ -22,16 +23,20 @@ namespace Booking.Controllers
     {
         private readonly ApplicationDbContext dbContext;
         private readonly UserManager<ApplicationUser> userManager;
+        private readonly GymClassRepository gymClassRepository;
 
         public GymClassesController(ApplicationDbContext context, UserManager<ApplicationUser> manager)
         {
             dbContext = context;
             userManager = manager;
+            gymClassRepository = new GymClassRepository(context);    // Must provide context
         }
 
         public async Task<IActionResult> GetBookings()
         {
             var userId = userManager.GetUserId(User);
+
+            // TODO handle if no bookings
             var model = new IndexViewModel
             {
                 GymClasses = await dbContext.ApplicationUserGymClasses
@@ -96,15 +101,15 @@ namespace Booking.Controllers
 
             if (!User.Identity.IsAuthenticated)
             {
-                model.GymClasses = await dbContext.GymClasses
+                var gymClasses = await gymClassRepository.GetAsync();
+                model.GymClasses = gymClasses
                     .Select(g => new GymClassViewModel
                     {
                         Id = g.Id,
                         Name = g.Name,
                         StartDate = g.StartDate,
                         Duration = g.Duration,
-                    })
-                    .ToListAsync();
+                    });
             }
 
             // ShowHistory show booked gymclasses including old (before todays date)
@@ -114,23 +119,9 @@ namespace Booking.Controllers
 
             if (viewModel.ShowHistory)
             {
-                model.GymClasses = await dbContext.ApplicationUserGymClasses
-                    .IgnoreQueryFilters()
-                    .Where(u => u.ApplicationUserId == userId)
-                    .Select(g => new GymClassViewModel
-                    {
-                        Id = g.GymClass.Id,
-                        Name = g.GymClass.Name,
-                        StartDate = g.GymClass.StartDate,
-                        Duration = g.GymClass.Duration,
-                        IsAttending = g.GymClass.AttendedMembers.Any(m => m.ApplicationUserId == userId)
-                    })
-                    .ToListAsync();
-            }
-            else           
-            {
-                model.GymClasses = await dbContext.GymClasses
-                    .Include(c => c.AttendedMembers)
+                var gymClasses = await gymClassRepository.GetHistory();
+
+                model.GymClasses = gymClasses
                     .Select(g => new GymClassViewModel
                     {
                         Id = g.Id,
@@ -138,8 +129,21 @@ namespace Booking.Controllers
                         StartDate = g.StartDate,
                         Duration = g.Duration,
                         IsAttending = g.AttendedMembers.Any(m => m.ApplicationUserId == userId)
-                    })
-                    .ToListAsync();
+                    });
+            }
+            else           
+            {
+                var gymClasses = await gymClassRepository.GetWithBookings();
+
+                model.GymClasses = gymClasses
+                    .Select(g => new GymClassViewModel
+                    {
+                        Id = g.Id,
+                        Name = g.Name,
+                        StartDate = g.StartDate,
+                        Duration = g.Duration,
+                        IsAttending = g.AttendedMembers.Any(m => m.ApplicationUserId == userId)
+                    });
             };
             return View(model);
         }
