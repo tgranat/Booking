@@ -75,6 +75,7 @@ namespace Booking.Data
 
                 var adminUser = await userManger.FindByNameAsync(adminEmail);
 
+                // Admin has bothroles, Admin and Member
                 foreach (var role in roleNames)
                 {
                     if (await userManger.IsInRoleAsync(adminUser, role)) continue;
