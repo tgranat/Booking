@@ -89,12 +89,47 @@ namespace Booking.Controllers
         }
 
         [AllowAnonymous]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(IndexViewModel viewModel = null)
         {
+            var model = new IndexViewModel();
             var userId = userManager.GetUserId(User);
-            var model = new IndexViewModel
+
+            if (!User.Identity.IsAuthenticated)
             {
-                GymClasses = await dbContext.GymClasses
+                model.GymClasses = await dbContext.GymClasses
+                    .Select(g => new GymClassViewModel
+                    {
+                        Id = g.Id,
+                        Name = g.Name,
+                        StartDate = g.StartDate,
+                        Duration = g.Duration,
+                    })
+                    .ToListAsync();
+            }
+
+            // ShowHistory show booked gymclasses including old (before todays date)
+            // Maybe should only show old classes, but easier to test like this...
+
+            // When ShowHistory checkbox is set in index.cshtmp, JavaScript (in site.js) submits
+
+            if (viewModel.ShowHistory)
+            {
+                model.GymClasses = await dbContext.ApplicationUserGymClasses
+                    .IgnoreQueryFilters()
+                    .Where(u => u.ApplicationUserId == userId)
+                    .Select(g => new GymClassViewModel
+                    {
+                        Id = g.GymClass.Id,
+                        Name = g.GymClass.Name,
+                        StartDate = g.GymClass.StartDate,
+                        Duration = g.GymClass.Duration,
+                        IsAttending = g.GymClass.AttendedMembers.Any(m => m.ApplicationUserId == userId)
+                    })
+                    .ToListAsync();
+            }
+            else           
+            {
+                model.GymClasses = await dbContext.GymClasses
                     .Include(c => c.AttendedMembers)
                     .Select(g => new GymClassViewModel
                     {
@@ -104,9 +139,9 @@ namespace Booking.Controllers
                         Duration = g.Duration,
                         IsAttending = g.AttendedMembers.Any(m => m.ApplicationUserId == userId)
                     })
-                    .ToListAsync()
+                    .ToListAsync();
             };
-            return View(nameof(Index), model);
+            return View(model);
         }
 
         [RequiredIdAndModelFilter]

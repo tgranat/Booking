@@ -8,5 +8,6 @@ namespace Booking.Models.ViewModels
     public class IndexViewModel
     {
         public IEnumerable<GymClassViewModel> GymClasses { get; set; }
+        public bool ShowHistory { get; set; }
     }
 }

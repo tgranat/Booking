@@ -12,6 +12,19 @@
     <a asp-action="Create">Create New</a>
 </p>
 }
+@if (User.IsInRole("Member"))
+{
+    <form asp-action="Index">
+        <dl class="row">
+            <dt class="col-sm-10">History</dt>
+            <dd class="col-sm-2">
+                <input class="form-control" type="checkbox" asp-for="ShowHistory" id="checkbox"/>
+            </dd>
+        </dl>
+    </form>
+
+}
+
 <table class="table">
     <thead>
         <tr>
