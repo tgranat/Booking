@@ -22,14 +22,14 @@ namespace Booking.Data
                 var fake = new Faker("sv");
                 var gymClasses = new List<GymClass>();
 
-                for (int i = 0; i < 5; i++)
+                for (int i = 0; i < 20; i++)
                 {
                     var gymClass = new GymClass
                     {
                         Name = fake.Company.CatchPhrase(),
                         Description = fake.Hacker.Verb(),
                         Duration = new TimeSpan(0, 55, 0),
-                        StartDate = DateTime.Now.AddDays(fake.Random.Int(-2, 2))
+                        StartDate = DateTime.Now.AddDays(fake.Random.Int(-2, 5))
                     };
                     gymClasses.Add(gymClass);
                 }
