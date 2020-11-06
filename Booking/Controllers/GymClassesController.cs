@@ -88,7 +88,6 @@ namespace Booking.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: GymClasses
         [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
@@ -110,7 +109,6 @@ namespace Booking.Controllers
             return View(nameof(Index), model);
         }
 
-        // GET: GymClasses/Details/5
         [RequiredIdAndModelFilter]
         public async Task<IActionResult> Details(int? id)
         {
@@ -122,17 +120,15 @@ namespace Booking.Controllers
             return View(gymClass);
         }
 
-        // GET: GymClasses/Create
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: GymClasses/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create([Bind("Id,Name,StartDate,Duration,Description")] CreateGymClassViewModel viewModel)
         {
             if (ModelState.IsValid)
@@ -153,8 +149,8 @@ namespace Booking.Controllers
             return View(viewModel);
         }
 
-        // GET: GymClasses/Edit/5
         [RequiredIdAndModelFilter]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             var gymClass = await dbContext.GymClasses.FindAsync(id);
@@ -176,11 +172,9 @@ namespace Booking.Controllers
             return View(viewModel);
         }
 
-        // POST: GymClasses/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name,StartDate,Duration,Description")] GymClass gymClass)
         {
             if (id != gymClass.Id)
@@ -211,8 +205,8 @@ namespace Booking.Controllers
             return View(gymClass);
         }
 
-        // GET: GymClasses/Delete/5
         [RequiredIdAndModelFilter]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             var gymClass = await dbContext.GymClasses
@@ -221,9 +215,9 @@ namespace Booking.Controllers
             return View(gymClass);
         }
 
-        // POST: GymClasses/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var gymClass = await dbContext.GymClasses.FindAsync(id);
