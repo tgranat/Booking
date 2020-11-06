@@ -15,7 +15,9 @@ using Booking.Filters;
 
 namespace Booking.Controllers
 {
-    [Authorize]   // Login required (except for actions when [AllowAnonymous] is used)
+    // AutorizeFilter added in Startup.cs now
+    // so I comment this out
+    //[Authorize]   // Login required (except for actions when [AllowAnonymous] is used)
     public class GymClassesController : Controller
     {
         private readonly ApplicationDbContext dbContext;

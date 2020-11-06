@@ -13,6 +13,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Booking.Models.Entities;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Authorization;
 
 namespace Booking
 {
@@ -45,7 +47,14 @@ namespace Booking
                 opt.Password.RequireNonAlphanumeric = false;
             });
 
-            services.AddControllersWithViews();
+            services.AddControllersWithViews(options =>
+            {
+                var policy = new AuthorizationPolicyBuilder()
+                    .RequireAuthenticatedUser()
+                    .RequireRole("Member")
+                    .Build();
+                options.Filters.Add(new AuthorizeFilter(policy));
+            });
 
             services.AddRazorPages();
         }
