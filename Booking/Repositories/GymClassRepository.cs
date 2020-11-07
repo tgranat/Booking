@@ -34,6 +34,10 @@ namespace Booking.Repositories
             return await db.GymClasses.Include(g => g.AttendedMembers).ToListAsync();
         }
 
+        public void Add(GymClass gymClass)
+        {
+            db.Add(gymClass);
+        }
         
     }
 }

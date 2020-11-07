@@ -65,19 +65,18 @@ namespace Booking.Controllers
             // If not logged in
             if (userId is null) return NotFound(); 
 
-            var attending = dbContext.ApplicationUserGymClasses
-                .Find(userId, id);
+            var attending = applicationUserRepository.GetAttending(userId, id);
 
             // TODO: check that id (GymClass) exist
 
             if (attending is null)
             {
                 var booking = new ApplicationUserGymClass { ApplicationUserId = userId, GymClassId = (int)id };
-                dbContext.ApplicationUserGymClasses.Add(booking);
+                applicationUserRepository.Add(booking);
             }
             else
             {
-                dbContext.ApplicationUserGymClasses.Remove(attending);
+                applicationUserRepository.Remove(attending);
             }
             await dbContext.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
@@ -170,7 +169,7 @@ namespace Booking.Controllers
                     Description = viewModel.Description
                 };
 
-                dbContext.Add(gymClass);
+                gymClassRepository.Add(gymClass);
                 await dbContext.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }

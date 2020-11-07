@@ -26,7 +26,7 @@ namespace Booking.Repositories
                                            .ToListAsync();
         }
 
-        public ApplicationUserGymClass GetAttending(int? id, string userId)
+        public ApplicationUserGymClass GetAttending(string userId, int? id)
         {
             return db.ApplicationUserGymClasses.Find(userId, id);
         }
@@ -34,6 +34,10 @@ namespace Booking.Repositories
         public void Add(ApplicationUserGymClass attending)
         {
             db.Add(attending);
+        }
+        public void Remove(ApplicationUserGymClass attending)
+        {
+            db.Remove(attending);
         }
 
     }
