@@ -15,6 +15,7 @@ using Microsoft.Extensions.Hosting;
 using Booking.Models.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
+using Booking.Repositories;
 
 namespace Booking
 {
@@ -57,6 +58,8 @@ namespace Booking
             });
 
             services.AddRazorPages();
+
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace Booking.Repositories
 {
-    public class UnitOfWork
+    public class UnitOfWork : IUnitOfWork
     {
         private ApplicationDbContext db;
-        public GymClassRepository GymClassRepository { get; private set; }
-        public ApplicationUserRepository AppUserRepository { get; private set; }
+        public IGymClassRepository GymClassRepository { get; private set; }
+        public IApplicationUserRepository AppUserRepository { get; private set; }
 
         public UnitOfWork(ApplicationDbContext db)
         {

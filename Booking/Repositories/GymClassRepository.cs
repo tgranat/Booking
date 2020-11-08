@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Booking.Repositories
 {
-    public class GymClassRepository
+    public class GymClassRepository : IGymClassRepository
     {
         private ApplicationDbContext db;
 

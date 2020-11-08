@@ -22,12 +22,12 @@ namespace Booking.Controllers
     public class GymClassesController : Controller
     {
         private readonly UserManager<ApplicationUser> userManager;
-        private readonly UnitOfWork unitOfWork;
+        private readonly IUnitOfWork unitOfWork;
 
-        public GymClassesController(ApplicationDbContext context, UserManager<ApplicationUser> manager)
+        public GymClassesController(IUnitOfWork unitOfWork, UserManager<ApplicationUser> manager)
         {
             userManager = manager;
-            unitOfWork = new UnitOfWork(context);
+            this.unitOfWork = unitOfWork;
         }
 
         public async Task<IActionResult> GetBookings()

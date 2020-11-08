@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Booking.Repositories
 {
-    public class ApplicationUserRepository
+    public class ApplicationUserRepository : IApplicationUserRepository
     {
         private ApplicationDbContext db;
 
