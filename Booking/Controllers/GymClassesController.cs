@@ -139,10 +139,7 @@ namespace Booking.Controllers
         [RequiredIdAndModelFilter]
         public async Task<IActionResult> Details(int? id)
         {
-            var gymClass = await dbContext.GymClasses
-                .Include(c => c.AttendedMembers)
-                .ThenInclude(a => a.ApplicationUser)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var gymClass = await gymClassRepository.GetAsync(id);
 
             return View(gymClass);
         }
@@ -180,7 +177,7 @@ namespace Booking.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
-            var gymClass = await dbContext.GymClasses.FindAsync(id);
+            var gymClass = await gymClassRepository.GetAsync(id);
 
             if (gymClass == null)
             {
@@ -213,7 +210,7 @@ namespace Booking.Controllers
             {
                 try
                 {
-                    dbContext.Update(gymClass);
+                    gymClassRepository.Update(gymClass);
                     await dbContext.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
@@ -236,9 +233,8 @@ namespace Booking.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
-            var gymClass = await dbContext.GymClasses
-                .FirstOrDefaultAsync(m => m.Id == id);
-  
+            var gymClass = await gymClassRepository.GetAsync(id);
+
             return View(gymClass);
         }
 
@@ -247,15 +243,15 @@ namespace Booking.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var gymClass = await dbContext.GymClasses.FindAsync(id);
-            dbContext.GymClasses.Remove(gymClass);
+            var gymClass = await gymClassRepository.GetAsync(id);
+            gymClassRepository.Remove(gymClass);
             await dbContext.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool GymClassExists(int id)
         {
-            return dbContext.GymClasses.Any(e => e.Id == id);
+            return gymClassRepository.Any(id);
         }
     }
 }

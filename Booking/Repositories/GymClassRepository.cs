@@ -21,6 +21,14 @@ namespace Booking.Repositories
         {
             return await db.GymClasses.ToListAsync();
         }
+        public async Task<GymClass> GetAsync(int? id)
+        {
+            return await db.GymClasses
+                .Include(c => c.AttendedMembers)
+                .ThenInclude(a => a.ApplicationUser)
+                .FirstOrDefaultAsync(m => m.Id == id);
+        }
+
         public async Task<IEnumerable<GymClass>> GetHistory()
         {
             return await db.GymClasses
@@ -38,6 +46,20 @@ namespace Booking.Repositories
         {
             db.Add(gymClass);
         }
-        
+
+        public void Update(GymClass gymClass)
+        {
+            db.Update(gymClass);
+        }
+
+        public void Remove(GymClass gymClass)
+        {
+            db.Remove(gymClass);
+        }
+
+        public bool Any(int? id)
+        {
+            return db.GymClasses.Any(e => e.Id == id);
+        }
     }
 }
