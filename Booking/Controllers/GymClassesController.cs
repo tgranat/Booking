@@ -21,25 +21,20 @@ namespace Booking.Controllers
     //[Authorize]   // Login required (except for actions when [AllowAnonymous] is used)
     public class GymClassesController : Controller
     {
-        private readonly ApplicationDbContext dbContext;
         private readonly UserManager<ApplicationUser> userManager;
-        private readonly GymClassRepository gymClassRepository;
-        private readonly ApplicationUserRepository applicationUserRepository;
+        private readonly UnitOfWork unitOfWork;
 
         public GymClassesController(ApplicationDbContext context, UserManager<ApplicationUser> manager)
         {
-            dbContext = context;
             userManager = manager;
-            gymClassRepository = new GymClassRepository(context);    // Must provide context
-            applicationUserRepository = new ApplicationUserRepository(context);
-
+            unitOfWork = new UnitOfWork(context);
         }
 
         public async Task<IActionResult> GetBookings()
         {
             var userId = userManager.GetUserId(User);
             var model = new IndexViewModel();
-            var gymClasses = await applicationUserRepository.GetBookings(userId);
+            var gymClasses = await unitOfWork.AppUserRepository.GetBookings(userId);
 
             model.GymClasses = gymClasses
                 .Select(g => new GymClassViewModel
@@ -65,20 +60,20 @@ namespace Booking.Controllers
             // If not logged in
             if (userId is null) return NotFound(); 
 
-            var attending = applicationUserRepository.GetAttending(userId, id);
+            var attending = unitOfWork.AppUserRepository.GetAttending(userId, id);
 
             // TODO: check that id (GymClass) exist
 
             if (attending is null)
             {
                 var booking = new ApplicationUserGymClass { ApplicationUserId = userId, GymClassId = (int)id };
-                applicationUserRepository.Add(booking);
+                unitOfWork.AppUserRepository.Add(booking);
             }
             else
             {
-                applicationUserRepository.Remove(attending);
+                unitOfWork.AppUserRepository.Remove(attending);
             }
-            await dbContext.SaveChangesAsync();
+            await unitOfWork.CompleteAsync();
             return RedirectToAction(nameof(Index));
         }
 
@@ -90,7 +85,7 @@ namespace Booking.Controllers
 
             if (!User.Identity.IsAuthenticated)
             {
-                var gymClasses = await gymClassRepository.GetAsync();
+                var gymClasses = await unitOfWork.GymClassRepository.GetAsync();
                 model.GymClasses = gymClasses
                     .Select(g => new GymClassViewModel
                     {
@@ -107,7 +102,7 @@ namespace Booking.Controllers
 
             if (viewModel.ShowHistory)
             {
-                var gymClasses = await gymClassRepository.GetHistory();
+                var gymClasses = await unitOfWork.GymClassRepository.GetHistory();
 
                 model.GymClasses = gymClasses
                     .Select(g => new GymClassViewModel
@@ -121,7 +116,7 @@ namespace Booking.Controllers
             }
             else           
             {
-                var gymClasses = await gymClassRepository.GetWithBookings();
+                var gymClasses = await unitOfWork.GymClassRepository.GetWithBookings();
 
                 model.GymClasses = gymClasses
                     .Select(g => new GymClassViewModel
@@ -139,7 +134,7 @@ namespace Booking.Controllers
         [RequiredIdAndModelFilter]
         public async Task<IActionResult> Details(int? id)
         {
-            var gymClass = await gymClassRepository.GetAsync(id);
+            var gymClass = await unitOfWork.GymClassRepository.GetAsync(id);
 
             return View(gymClass);
         }
@@ -166,8 +161,8 @@ namespace Booking.Controllers
                     Description = viewModel.Description
                 };
 
-                gymClassRepository.Add(gymClass);
-                await dbContext.SaveChangesAsync();
+                unitOfWork.GymClassRepository.Add(gymClass);
+                await unitOfWork.CompleteAsync();
                 return RedirectToAction(nameof(Index));
             }
             return View(viewModel);
@@ -177,7 +172,7 @@ namespace Booking.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
-            var gymClass = await gymClassRepository.GetAsync(id);
+            var gymClass = await unitOfWork.GymClassRepository.GetAsync(id);
 
             if (gymClass == null)
             {
@@ -210,8 +205,8 @@ namespace Booking.Controllers
             {
                 try
                 {
-                    gymClassRepository.Update(gymClass);
-                    await dbContext.SaveChangesAsync();
+                    unitOfWork.GymClassRepository.Update(gymClass);
+                    await unitOfWork.CompleteAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -233,7 +228,7 @@ namespace Booking.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
-            var gymClass = await gymClassRepository.GetAsync(id);
+            var gymClass = await unitOfWork.GymClassRepository.GetAsync(id);
 
             return View(gymClass);
         }
@@ -243,15 +238,15 @@ namespace Booking.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var gymClass = await gymClassRepository.GetAsync(id);
-            gymClassRepository.Remove(gymClass);
-            await dbContext.SaveChangesAsync();
+            var gymClass = await unitOfWork.GymClassRepository.GetAsync(id);
+            unitOfWork.GymClassRepository.Remove(gymClass);
+            await unitOfWork.CompleteAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool GymClassExists(int id)
         {
-            return gymClassRepository.Any(id);
+            return unitOfWork.GymClassRepository.Any(id);
         }
     }
 }
