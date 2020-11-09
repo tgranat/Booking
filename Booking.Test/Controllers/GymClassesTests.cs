@@ -1,11 +1,14 @@
 ﻿using Booking.Controllers;
 using Booking.Models.Entities;
+using Booking.Models.ViewModels;
 using Booking.Repositories;
+using Booking.Test.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Booking.Test.Controllers
@@ -31,6 +34,26 @@ namespace Booking.Test.Controllers
                 new Mock<UserManager<ApplicationUser>>(mockUserStore, null, null, null, null, null, null, null, null);
 
             controller = new GymClassesController(mockUnitOfWork.Object, mockUserManager.Object);
+        }
+
+
+        [TestMethod]
+        public void Index_NotAuthenticated_ReturnsExpected()
+        {
+            var gymClasses = GetGymClassList();
+
+            var expected = new IndexViewModel();
+
+            gymClasses
+                 .Select(g => new GymClassViewModel
+                 {
+                     Id = g.Id,
+                     Name = g.Name,
+                     StartDate = g.StartDate,
+                     Duration = g.Duration
+                 });
+
+            controller.SetUserIsAuthenticated(false);
         }
 
         private List<GymClass> GetGymClassList()
