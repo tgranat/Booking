@@ -13,6 +13,7 @@ namespace Booking.Test.Extensions
         public static void SetUserIsAuthenticated(this Controller controller, bool isAuthenticated)
         {
             var mockContext = new Mock<HttpContext>();
+            // SetupGet mocks the getter for a property
             mockContext.SetupGet(context => context.User.Identity.IsAuthenticated).Returns(isAuthenticated);
             controller.ControllerContext = new ControllerContext { HttpContext = mockContext.Object };
         }

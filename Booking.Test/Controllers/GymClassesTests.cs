@@ -4,6 +4,7 @@ using Booking.Models.ViewModels;
 using Booking.Repositories;
 using Booking.Test.Extensions;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System;
@@ -14,7 +15,7 @@ using System.Text;
 namespace Booking.Test.Controllers
 {
     [TestClass]
-    class GymClassesTests
+    public class GymClassesTests
     {
         private Mock<IGymClassRepository> repository;
         private GymClassesController controller;
@@ -31,7 +32,7 @@ namespace Booking.Test.Controllers
 
             var mockUserStore = new Mock<IUserStore<ApplicationUser>>();
             var mockUserManager =
-                new Mock<UserManager<ApplicationUser>>(mockUserStore, null, null, null, null, null, null, null, null);
+                new Mock<UserManager<ApplicationUser>>(mockUserStore.Object, null, null, null, null, null, null, null, null);
 
             controller = new GymClassesController(mockUnitOfWork.Object, mockUserManager.Object);
         }
@@ -44,7 +45,7 @@ namespace Booking.Test.Controllers
 
             var expected = new IndexViewModel();
 
-            gymClasses
+            expected.GymClasses =  gymClasses
                  .Select(g => new GymClassViewModel
                  {
                      Id = g.Id,
@@ -54,6 +55,11 @@ namespace Booking.Test.Controllers
                  });
 
             controller.SetUserIsAuthenticated(false);
+            repository.Setup(r => r.GetAsync()).ReturnsAsync(gymClasses);
+            var viewModel = new IndexViewModel { ShowHistory = false };
+            var viewResult = controller.Index(viewModel).Result as ViewResult;
+            var actual = viewResult.Model as IndexViewModel;
+            Assert.AreEqual(expected.GymClasses.Count(), actual.GymClasses.Count());
         }
 
         private List<GymClass> GetGymClassList()
