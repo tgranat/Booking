@@ -114,7 +114,7 @@ namespace Booking.Controllers
                         IsAttending = g.AttendedMembers.Any(m => m.ApplicationUserId == userId)
                     });
             }
-            else           
+            if(User.Identity.IsAuthenticated && !viewModel.ShowHistory)           
             {
                 var gymClasses = await unitOfWork.GymClassRepository.GetWithBookings();
 
